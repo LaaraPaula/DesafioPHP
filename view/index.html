@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Relatório de Usuários</title>
+  <style>
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+    }
+    th {
+      background-color: #f0f0f0;
+    }
+    img {
+      border-radius: 50%;
+    }
+  </style>
+</head>
+<body>
+    <h1>Usuários Cadastrados</h1>
+  
+    <input type="text" id="filtro" placeholder="🔍 Buscar por nome..." oninput="filtrarTabela()" style="margin-bottom: 15px; padding: 6px; width: 300px;">
+    <h2>Cadastrar Novo Usuário</h2>
+    <form id="formCadastro" onsubmit="cadastrarUsuario(event)" style="margin-bottom: 20px;">
+        <input type="text" placeholder="Nome" name="nome" required>
+        <input type="email" placeholder="Email" name="email" required>
+        <input type="text" placeholder="Gênero" name="genero">
+        <input type="text" placeholder="Cidade" name="cidade">
+        <input type="text" placeholder="País" name="pais">
+        <button type="submit">Cadastrar</button>
+    </form>
+    <table id="tabelaUsuarios">
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Email</th>
+          <th>Gênero</th>
+          <th>Cidade</th>
+          <th>País</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody id="tabelaCorpo"></tbody>
+    </table>
+  
+    <script>
+      let dadosUsuarios = [];
+  
+      function carregarUsuarios() {
+        fetch('../api/lista_usuario.php')
+          .then(response => response.json())
+          .then(dados => {
+            dadosUsuarios = dados;
+            renderizarTabela(dadosUsuarios);
+          });
+      }
+      function cadastrarUsuario(event) {
+        event.preventDefault();
+
+        const form = document.getElementById('formCadastro');
+        const formData = new FormData(form);
+        const dados = Object.fromEntries(formData.entries());
+        console.log(dados); 
+        fetch('../api/cadastra_usuario.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(dados)
+        })
+        .then(resp => resp.json())
+        .then(resp => {
+            alert(resp.mensagem || resp.erro);
+            form.reset();
+            carregarUsuarios();
+        });
+        }
+
+      function renderizarTabela(dados) {
+        const tbody = document.querySelector('#tabelaCorpo');
+        tbody.innerHTML = '';
+  
+        dados.forEach(usuario => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td contenteditable="true" data-campo="nome">${usuario.nome}</td>
+            <td contenteditable="true" data-campo="email">${usuario.email}</td>
+            <td contenteditable="true" data-campo="genero">${usuario.genero}</td>
+            <td contenteditable="true" data-campo="cidade">${usuario.cidade}</td>
+            <td contenteditable="true" data-campo="pais">${usuario.pais}</td>
+            <td>
+              <button onclick="salvarUsuario(this, ${usuario.id})">💾</button>
+              <button onclick="deletarUsuario(${usuario.id})">🗑️</button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+  
+      function salvarUsuario(botao, id) {
+        const tr = botao.closest('tr');
+        const campos = tr.querySelectorAll('[data-campo]');
+        const dados = { id: id };
+  
+        campos.forEach(td => {
+          const campo = td.getAttribute('data-campo');
+          dados[campo] = td.textContent.trim();
+        });
+  
+        fetch('../api/edita_usuario.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(dados)
+        })
+        .then(resp => resp.json())
+        .then(resp => alert(resp.mensagem || resp.erro));
+      }
+  
+      function deletarUsuario(id) {
+        if (!confirm("Tem certeza que deseja deletar este usuário?")) return;
+  
+        fetch('../api/deleta_usuario.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: id })
+        })
+        .then(resp => resp.json())
+        .then(resp => {
+          alert(resp.mensagem || resp.erro);
+          carregarUsuarios(); 
+        });
+      }
+  
+      function filtrarTabela() {
+        const termo = document.getElementById('filtro').value.toLowerCase();
+        const filtrados = dadosUsuarios.filter(usuario =>
+          usuario.nome.toLowerCase().includes(termo)
+        );
+        renderizarTabela(filtrados);
+      }
+  
+      carregarUsuarios(); // carrega ao abrir a página
+    </script>
+  </body>  
+</html>
