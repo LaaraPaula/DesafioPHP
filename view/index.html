@@ -8,9 +8,9 @@
 <body>
     <h1>Usuários Cadastrados</h1>
   
-    <input type="text" id="filtro" placeholder="🔍 Buscar por nome..." oninput="filtrarTabela()" style="margin-bottom: 15px; padding: 6px; width: 300px;">
+    <input type="text" id="filtro" placeholder="🔍 Buscar por nome..." oninput="filtrarTabela()">
     <h2>Cadastrar Novo Usuário</h2>
-    <form id="formCadastro" onsubmit="cadastrarUsuario(event)" enctype="multipart/form-data" style="margin-bottom: 20px;">
+    <form id="formCadastro" onsubmit="cadastrarUsuario(event)" enctype="multipart/form-data">
         <input type="text" placeholder="Nome" name="nome" required>
         <input type="email" placeholder="Email" name="email" required>
         <input type="text" placeholder="Gênero" name="genero">

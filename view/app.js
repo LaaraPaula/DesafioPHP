@@ -43,7 +43,6 @@ function importarUsuario() {
     fetch('../api/usuario_aleatorio.php')
     .then(resp => resp.json())
     .then(usuario => {
-        console.log("Usuário importado:", usuario);
         document.querySelector('[name="nome"]').value = usuario.nome;
         document.querySelector('[name="email"]').value = usuario.email;
         document.querySelector('[name="genero"]').value = usuario.genero;
@@ -61,7 +60,7 @@ function renderizarTabela(dados) {
     dados.forEach(usuario => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
-        <td><img src="${usuario.foto && usuario.foto.startsWith('http') ? usuario.foto : '../' + usuario.foto}" alt="Foto" width="50"></td>
+        <td><img src="${usuario.foto && usuario.foto.startsWith('http') ? usuario.foto : '../' + usuario.foto}" alt="Foto"></td>
         <td contenteditable="true" data-campo="nome">${usuario.nome}</td>
         <td contenteditable="true" data-campo="email">${usuario.email}</td>
         <td contenteditable="true" data-campo="genero">${usuario.genero}</td>
