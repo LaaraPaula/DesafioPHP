@@ -11,11 +11,11 @@ foreach ($dados['results'] as $usuario) {
     $genero = $usuario['gender'];
     $cidade = $usuario['location']['city'];
     $pais = $usuario['location']['country'];
+    $foto = $usuario['picture']['medium'];
 
-    $sql = "INSERT INTO usuarios (nome, email, genero, cidade, pais) VALUES (?, ?, ?, ?, ?)";
+    $sql = "INSERT INTO usuarios (nome, email, genero, cidade, pais, foto) VALUES (?, ?, ?, ?, ?, ?)";
     $stmt = $pdo->prepare($sql);
     $stmt->execute([$nome, $email, $genero, $cidade, $pais, $foto]);
 }
 
 echo "Usuários importados com sucesso!";
-?>
